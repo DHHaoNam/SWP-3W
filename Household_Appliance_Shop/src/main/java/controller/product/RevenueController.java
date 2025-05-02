@@ -78,6 +78,7 @@ public class RevenueController extends HttpServlet {
             Date startDate;
             Date endDate;
 
+            // Default to last 30 days if no dates are provided
             if (startDateStr != null && !startDateStr.isEmpty()
                     && endDateStr != null && !endDateStr.isEmpty()) {
                 startDate = dateFormat.parse(startDateStr);
@@ -91,8 +92,8 @@ public class RevenueController extends HttpServlet {
 
             RevenueDAO revenueDAO = new RevenueDAO();
             List<RevenueDTO> revenueData = revenueDAO.getRevenueByDateRange(startDate, endDate);
-            List<TopCustomerDTO> topCustomers = revenueDAO.getTopCustomers(startDate, endDate); // Fixed to always return top 10
-            List<TopProductDTO> topProducts = revenueDAO.getTopProducts(startDate, endDate); // Fixed to always return top 10
+            List<TopCustomerDTO> topCustomers = revenueDAO.getTopCustomers(startDate, endDate);
+            List<TopProductDTO> topProducts = revenueDAO.getTopProducts(startDate, endDate);
 
             double totalRevenue = 0;
             for (RevenueDTO item : revenueData) {
@@ -100,6 +101,7 @@ public class RevenueController extends HttpServlet {
             }
 
             if (request.getHeader("X-Requested-With") != null) {
+                // Handle AJAX request by returning JSON data
                 response.setContentType("application/json");
                 response.setCharacterEncoding("UTF-8");
 
@@ -112,6 +114,7 @@ public class RevenueController extends HttpServlet {
                 Gson gson = new Gson();
                 response.getWriter().write(gson.toJson(responseData));
             } else {
+                // Regular page request
                 request.setAttribute("revenueData", revenueData);
                 request.setAttribute("totalRevenue", totalRevenue);
                 request.setAttribute("topCustomers", topCustomers);
@@ -146,9 +149,8 @@ public class RevenueController extends HttpServlet {
      *
      * @return a String containing servlet description
      */
-    @Override
+     @Override
     public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
+        return "Revenue management servlet.";
+    }
 }

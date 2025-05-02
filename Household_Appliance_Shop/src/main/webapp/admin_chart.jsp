@@ -102,7 +102,6 @@
 
         <div class="card">
 
-            <!-- Top Customers -->
             <div class="card mb-4 shadow-sm" style="margin-left: 50px;">
                 <div class="card-header bg-primary text-white">
                     <h5 class="mb-0"><i class="fas fa-user"></i> Top 5 Customers</h5>
@@ -145,9 +144,6 @@
                     </ul>
                 </div>
             </div>
-
-
-
             <div class="card-body">
                 <h1 class="card-title">Revenue Chart</h1>
 
@@ -156,19 +152,26 @@
                     <div class="form-row mb-3">
                         <div class="form-group col-md-6">
                             <label for="startDate">From date:</label>
-                            <input type="date" id="startDate" name="startDate" value="${startDate}" class="form-control">
+                            <input type="date" id="startDate" name="startDate" 
+                                   value="${startDate}"
+                                   class="form-control">
                         </div>
                         <div class="form-group col-md-6">
                             <label for="endDate">To date:</label>
-                            <input type="date" id="endDate" name="endDate" value="${endDate}" class="form-control">
+                            <input type="date" id="endDate" name="endDate" 
+                                   value="${endDate}"
+                                   class="form-control">
                         </div>
                     </div>
-                    <button type="button" onclick="updateChart()" class="btn btn-primary">Update</button>
+                    <button type="button" onclick="updateChart()" 
+                            class="btn btn-primary">
+                        Update
+                    </button>
                 </form>
 
                 <!-- Loading Indicator -->
                 <div id="loadingIndicator" class="d-none">
-                    <p class="text-center text-secondary">Loading data...</p>
+                    <p class="text-center text-secondary">Data loading...</p>
                 </div>
 
                 <!-- Combo Chart -->
@@ -179,7 +182,7 @@
                 <!-- Total Revenue -->
                 <div class="alert alert-light">
                     <p class="font-weight-bold">
-                        Total revenue: 
+                        Total revenue:
                         <span id="totalRevenue">
                             <fmt:formatNumber value="${totalRevenue}" type="currency" currencySymbol="₫"/>
                         </span>
@@ -187,142 +190,142 @@
                 </div>
             </div>
         </div>
-    </div>
 
-    <script>
-        let comboChart;
-        // Initialize chart with data from server
-        document.addEventListener('DOMContentLoaded', function() {
-        initializeChart();
-        });
-        function initializeChart() {
-        const ctx = document.getElementById('comboChart').getContext('2d');
-        const data = {
-        labels: [
-        <c:forEach items="${revenueData}" var="item" varStatus="status">
-        '<fmt:formatDate value="${item.date}" pattern="dd/MM/yyyy"/>'${!status.last ? ',' : ''}
-        </c:forEach>
-        ],
-                datasets: [
-                {
-                type: 'bar',
-                        label: 'Revenue',
-                        data: [
-        <c:forEach items="${revenueData}" var="item" varStatus="status">
-            ${item.revenue}${!status.last ? ',' : ''}
-        </c:forEach>
-                        ],
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                },
-                {
-                type: 'line',
-                        label: 'Revenue',
-                        data: [
-        <c:forEach items="${revenueData}" var="item" varStatus="status">
-            ${item.revenue}${!status.last ? ',' : ''}
-        </c:forEach>
-                        ],
-                        fill: false,
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
-                }
-                ]
-        };
-        if (comboChart) {
-        comboChart.destroy();
-        }
 
-        comboChart = new Chart(ctx, {
-        type: 'combo',
-                data: data,
-                options: {
-                responsive: true,
-                        maintainAspectRatio: false,
-                        scales: {
-                        y: {
-                        beginAtZero: true,
-                                ticks: {
-                                callback: function(value) {
-                                return new Intl.NumberFormat('vi-VN', {
-                                style: 'currency',
-                                        currency: 'VND'
-                                }).format(value);
-                                }
-                                }
-                        }
-                        },
-                        plugins: {
-                        tooltip: {
-                        callbacks: {
-                        label: function(context) {
-                        return new Intl.NumberFormat('vi-VN', {
-                        style: 'currency',
-                                currency: 'VND'
-                        }).format(context.raw);
-                        }
-                        }
-                        }
-                        }
-                }
-        });
-        }
+        <script>
+            let comboChart;
+            // Initialize chart with data from server
+            document.addEventListener('DOMContentLoaded', function() {
+            initializeChart();
+            });
+            function initializeChart() {
+            const ctx = document.getElementById('comboChart').getContext('2d');
+            const data = {
+            labels: [
+            <c:forEach items="${revenueData}" var="item" varStatus="status">
+            '<fmt:formatDate value="${item.date}" pattern="dd/MM/yyyy"/>'${!status.last ? ',' : ''}
+            </c:forEach>
+            ],
+                    datasets: [
+                    {
+                    type: 'bar',
+                            label: 'Revenue',
+                            data: [
+            <c:forEach items="${revenueData}" var="item" varStatus="status">
+                ${item.revenue}${!status.last ? ',' : ''}
+            </c:forEach>
+                            ],
+                            backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                            borderColor: 'rgba(54, 162, 235, 1)',
+                            borderWidth: 1
+                    },
+                    {
+                    type: 'line',
+                            label: 'Revenue',
+                            data: [
+            <c:forEach items="${revenueData}" var="item" varStatus="status">
+                ${item.revenue}${!status.last ? ',' : ''}
+            </c:forEach>
+                            ],
+                            fill: false,
+                            borderColor: 'rgb(75, 192, 192)',
+                            tension: 0.1
+                    }
+                    ]
+            };
+            if (comboChart) {
+            comboChart.destroy();
+            }
 
-        // Function to update chart with new date range
-        function updateChart() {
-        const startDate = document.getElementById('startDate').value;
-        const endDate = document.getElementById('endDate').value;
-        const loadingIndicator = document.getElementById('loadingIndicator');
-        loadingIndicator.classList.remove('d-none');
-        fetch(`/RevenueController?startDate=${startDate}&endDate=${endDate}`)
-                .then(response => response.json())
-                .then(data => {
-                loadingIndicator.classList.add('d-none');
-                updateChartWithData(data);
-                });
-        }
+            comboChart = new Chart(ctx, {
+            type: 'combo',
+                    data: data,
+                    options: {
+                    responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                            y: {
+                            beginAtZero: true,
+                                    ticks: {
+                                    callback: function(value) {
+                                    return new Intl.NumberFormat('vi-VN', {
+                                    style: 'currency',
+                                            currency: 'VND'
+                                    }).format(value);
+                                    }
+                                    }
+                            }
+                            },
+                            plugins: {
+                            tooltip: {
+                            callbacks: {
+                            label: function(context) {
+                            return new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                                    currency: 'VND'
+                            }).format(context.raw);
+                            }
+                            }
+                            }
+                            }
+                    }
+            });
+            }
 
-        // Function to update chart with fetched data
-        function updateChartWithData(data) {
-        const ctx = document.getElementById('comboChart').getContext('2d');
-        const newData = {
-        labels: data.revenueData.map(item => item.date),
-                datasets: [
-                {
-                type: 'bar',
-                        label: 'Revenue',
-                        data: data.revenueData.map(item => item.revenue),
-                        backgroundColor: 'rgba(54, 162, 235, 0.2)',
-                        borderColor: 'rgba(54, 162, 235, 1)',
-                        borderWidth: 1
-                },
-                {
-                type: 'line',
-                        label: 'Revenue',
-                        data: data.revenueData.map(item => item.revenue),
-                        fill: false,
-                        borderColor: 'rgb(75, 192, 192)',
-                        tension: 0.1
-                }
-                ]
-        };
-        if (comboChart) {
-        comboChart.destroy();
-        }
+            // Function to update chart with new date range
+            function updateChart() {
+            const startDate = document.getElementById('startDate').value;
+            const endDate = document.getElementById('endDate').value;
+            if (!startDate || !endDate) {
+            alert('Vui lòng chọn khoảng thời gian');
+            return;
+            }
 
-        comboChart = new Chart(ctx, {
-        type: 'combo',
-                data: newData,
-                options: comboChart.options
-        });
-        // Update total revenue display
-        const totalRevenue = data.totalRevenue;
-        document.getElementById('totalRevenue').textContent = new Intl.NumberFormat('vi-VN', {
-        style: 'currency',
-                currency: 'VND'
-        }).format(totalRevenue);
-        }
-    </script>
-</body>
+            // Show loading indicator
+            document.getElementById('loadingIndicator').classList.remove('d-none');
+            // Build URL with parameters
+            const url = new URL('/RevenueController', window.location.origin);
+            url.searchParams.append('startDate', startDate);
+            url.searchParams.append('endDate', endDate);
+            // Make AJAX request
+            fetch(url, {
+            method: 'GET',
+                    headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                    }
+            })
+                    .then(response => {
+                    if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                    }
+                    return response.json();
+                    })
+                    .then(data => {
+                    // Update chart data
+                    comboChart.data.labels = data.revenueData.map(item => {
+                    const date = new Date(item.date);
+                    return date.toLocaleDateString('vi-VN');
+                    });
+                    comboChart.data.datasets[0].data = data.revenueData.map(item => item.revenue);
+                    comboChart.data.datasets[1].data = data.revenueData.map(item => item.revenue);
+                    comboChart.update();
+                    // Update total revenue
+                    document.getElementById('totalRevenue').textContent =
+                            new Intl.NumberFormat('vi-VN', {
+                            style: 'currency',
+                                    currency: 'VND'
+                            }).format(data.totalRevenue);
+                    })
+                    .catch(error => {
+                    console.error('Error:', error);
+                    alert('Có lỗi xảy ra khi tải dữ liệu: ' + error.message);
+                    })
+                    .finally(() => {
+                    // Hide loading indicator
+                    document.getElementById('loadingIndicator').classList.add('d-none');
+                    });
+            }
+        </script>
+
+    </body>
 </html>

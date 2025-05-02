@@ -213,6 +213,39 @@
             }
         </style>
     </head>
+    <script>
+        function confirmCancel(orderId) {
+            const reason = prompt("Vui lòng nhập lý do hủy đơn hàng:");
+
+            if (reason === null || reason.trim() === "") {
+                alert("Bạn phải nhập lý do để hủy đơn hàng!");
+                return false;
+            }
+
+            // Tạo form ẩn để gửi dữ liệu
+            const form = document.createElement("form");
+            form.method = "POST";
+            form.action = "CancelOrder";
+
+            const orderInput = document.createElement("input");
+            orderInput.type = "hidden";
+            orderInput.name = "orderId";
+            orderInput.value = orderId;
+
+            const reasonInput = document.createElement("input");
+            reasonInput.type = "hidden";
+            reasonInput.name = "reason";
+            reasonInput.value = reason;
+
+            form.appendChild(orderInput);
+            form.appendChild(reasonInput);
+
+            document.body.appendChild(form);
+            form.submit();
+
+            return false; // chặn link mặc định
+        }
+    </script>
 
     <body>
         <jsp:include page="header.jsp"></jsp:include>
@@ -280,12 +313,14 @@
                                         <th>Order Date</th>
                                         <th>Total Amount</th>
                                         <th>Status</th>
+                                            <% if (currentStatus != null && currentStatus == 5) { %>
+                                        <th>Cancel Reason</th>
+                                            <% } %>
                                         <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <%
-                                        if (orders != null && !orders.isEmpty()) {
+                                    <% if (orders != null && !orders.isEmpty()) {
                                             for (OrderInfo order : orders) {
                                     %>
                                     <tr>
@@ -315,18 +350,30 @@
                                                 }
                                             %>
                                         </td>
+
+                                        <% if (currentStatus != null && currentStatus == 5) { %>
+                                        <td>
+                                            <%
+                                                model.CancelReason cancelReason = (model.CancelReason) request.getAttribute("cancelReason_" + order.getOrderID());
+                                                String reasonText = (cancelReason != null) ? cancelReason.getReason() : "N/A";
+                                            %>
+                                            <%= reasonText%>
+                                        </td>
+                                        <% }%>
+
                                         <td>
                                             <a href="viewOrderDetails_customer?id=<%= order.getOrderID()%>" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-eye"></i> View
                                             </a>
+
                                             <% if (order.getOrderStatus() == 4) {%>
                                             <a href="javascript:void(0);" onclick="showFeedbackModal('<%= order.getOrderID()%>');" class="btn btn-success btn-sm feedback-btn">
                                                 <i class="fas fa-comment"></i> Feedback
                                             </a>
                                             <% } %>
+
                                             <% if (order.getOrderStatus() == 1) {%>
-                                            <a href="CancelOrder?orderId=<%= order.getOrderID()%>" class="btn btn-danger" 
-                                               onclick="return confirm('Are you sure you want to cancel this order?');">
+                                            <a href="#" class="btn btn-danger" onclick="return confirmCancel(<%= order.getOrderID()%>)">
                                                 Cancel Order
                                             </a>
                                             <% } %>
@@ -337,7 +384,7 @@
                                     } else {
                                     %>
                                     <tr>
-                                        <td colspan="5">No orders available.</td>
+                                        <td colspan="<%= (currentStatus != null && currentStatus == 5) ? 6 : 5%>">No orders available.</td>
                                     </tr>
                                     <% }%>
                                 </tbody>
@@ -380,116 +427,116 @@
         <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 
         <script>
-                                                   // Function to show the feedback modal
-                                                   function showFeedbackModal(orderId) {
-                                                       $('#feedbackModal').modal('show');
+                                                // Function to show the feedback modal
+                                                function showFeedbackModal(orderId) {
+                                                    $('#feedbackModal').modal('show');
 
-                                                       // Load the products from this order
-                                                       $.ajax({
-                                                           url: 'GetOrderProductsForFeedback',
-                                                           type: 'GET',
-                                                           data: {
-                                                               orderId: orderId
-                                                           },
-                                                           success: function (response) {
-                                                               const orderDetailId = response.orderDetailId; // Make sure this is correct
-                                                               $('#orderDetailId').val(orderDetailId); // Set the hidden input value
+                                                    // Load the products from this order
+                                                    $.ajax({
+                                                        url: 'GetOrderProductsForFeedback',
+                                                        type: 'GET',
+                                                        data: {
+                                                            orderId: orderId
+                                                        },
+                                                        success: function (response) {
+                                                            const orderDetailId = response.orderDetailId; // Make sure this is correct
+                                                            $('#orderDetailId').val(orderDetailId); // Set the hidden input value
 
-                                                               $('#feedbackProductList').html(response);
+                                                            $('#feedbackProductList').html(response);
 
-                                                               // Assuming the response contains orderDetailID, set it here
-                                                               // Adjust this line based on your actual response structure
+                                                            // Assuming the response contains orderDetailID, set it here
+                                                            // Adjust this line based on your actual response structure
 
-                                                               // Initialize star ratings for all products
-                                                               initAllStarRatings();
+                                                            // Initialize star ratings for all products
+                                                            initAllStarRatings();
 
-                                                               // Set up feedback form submission
-                                                               setupFeedbackForms();
-                                                           },
-                                                           error: function () {
-                                                               $('#feedbackProductList').html('<div class="alert alert-danger">Error loading products. Please try again later.</div>');
-                                                           }
-                                                       });
-                                                   }
+                                                            // Set up feedback form submission
+                                                            setupFeedbackForms();
+                                                        },
+                                                        error: function () {
+                                                            $('#feedbackProductList').html('<div class="alert alert-danger">Error loading products. Please try again later.</div>');
+                                                        }
+                                                    });
+                                                }
 
-                                                   // Initialize all star ratings
-                                                   function initAllStarRatings() {
-                                                       $('.feedback-form').each(function () {
-                                                           const form = $(this);
-                                                           const stars = form.find('.star-rating .star');
-                                                           const ratingInput = form.find('input[name="rating"]');
+                                                // Initialize all star ratings
+                                                function initAllStarRatings() {
+                                                    $('.feedback-form').each(function () {
+                                                        const form = $(this);
+                                                        const stars = form.find('.star-rating .star');
+                                                        const ratingInput = form.find('input[name="rating"]');
 
-                                                           stars.on('click', function () {
-                                                               const value = $(this).data('value');
-                                                               ratingInput.val(value);
+                                                        stars.on('click', function () {
+                                                            const value = $(this).data('value');
+                                                            ratingInput.val(value);
 
-                                                               stars.removeClass('selected');
-                                                               $(this).prevAll('.star').addBack().addClass('selected');
-                                                           });
+                                                            stars.removeClass('selected');
+                                                            $(this).prevAll('.star').addBack().addClass('selected');
+                                                        });
 
-                                                           // Hover effect
-                                                           stars.hover(
-                                                                   function () {
-                                                                       const value = $(this).data('value');
-                                                                       $(this).prevAll('.star').addBack().addClass('hover');
-                                                                   },
-                                                                   function () {
-                                                                       stars.removeClass('hover');
-                                                                   }
-                                                           );
-                                                       });
-                                                   }
+                                                        // Hover effect
+                                                        stars.hover(
+                                                                function () {
+                                                                    const value = $(this).data('value');
+                                                                    $(this).prevAll('.star').addBack().addClass('hover');
+                                                                },
+                                                                function () {
+                                                                    stars.removeClass('hover');
+                                                                }
+                                                        );
+                                                    });
+                                                }
 
-                                                   // Set up feedback form submission
-                                                   function setupFeedbackForms() {
-                                                       $('.feedback-form').submit(function (e) {
-                                                           e.preventDefault();
+                                                // Set up feedback form submission
+                                                function setupFeedbackForms() {
+                                                    $('.feedback-form').submit(function (e) {
+                                                        e.preventDefault();
 
-                                                           const form = $(this);
-                                                           const productId = form.find('input[name="productId"]').val();
-                                                           const rating = form.find('input[name="rating"]').val();
-                                                           const comment = form.find('textarea[name="comment"]').val();
-                                                           const orderDetailId = form.find('input[name="orderDetailId"]').val(); // Get orderDetailID
+                                                        const form = $(this);
+                                                        const productId = form.find('input[name="productId"]').val();
+                                                        const rating = form.find('input[name="rating"]').val();
+                                                        const comment = form.find('textarea[name="comment"]').val();
+                                                        const orderDetailId = form.find('input[name="orderDetailId"]').val(); // Get orderDetailID
 
-                                                           if (!rating) {
-                                                               Swal.fire({
-                                                                   icon: 'warning',
-                                                                   title: 'Rating Required',
-                                                                   text: 'Please select a star rating before submitting'
-                                                               });
-                                                               return;
-                                                           }
+                                                        if (!rating) {
+                                                            Swal.fire({
+                                                                icon: 'warning',
+                                                                title: 'Rating Required',
+                                                                text: 'Please select a star rating before submitting'
+                                                            });
+                                                            return;
+                                                        }
 
-                                                           $.ajax({
-                                                               url: 'feedback',
-                                                               type: 'POST',
-                                                               data: {
-                                                                   productId: productId,
-                                                                   rating: rating,
-                                                                   comment: comment,
-                                                                   orderDetailId: orderDetailId
-                                                               },
-                                                               success: function (response) {
-                                                                   // Show success message and disable the form
-                                                                   form.html('<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i> Your feedback has been submitted successfully!</div>');
+                                                        $.ajax({
+                                                            url: 'feedback',
+                                                            type: 'POST',
+                                                            data: {
+                                                                productId: productId,
+                                                                rating: rating,
+                                                                comment: comment,
+                                                                orderDetailId: orderDetailId
+                                                            },
+                                                            success: function (response) {
+                                                                // Show success message and disable the form
+                                                                form.html('<div class="alert alert-success"><i class="fas fa-check-circle me-2"></i> Your feedback has been submitted successfully!</div>');
 
-                                                                   Swal.fire({
-                                                                       icon: 'success',
-                                                                       title: 'Thank you!',
-                                                                       text: 'Your feedback has been submitted successfully'
-                                                                   });
-                                                               },
-                                                               error: function (xhr) {
-                                                                   Swal.fire({
-                                                                       icon: 'error',
-                                                                       title: 'Error',
-                                                                       text: 'There was a problem submitting your feedback. Please try again later.'
-                                                                   });
-                                                                   form.append('<div class="alert alert-danger mt-3">Error submitting feedback: ' + xhr.responseText + '</div>');
-                                                               }
-                                                           });
-                                                       });
-                                                   }
+                                                                Swal.fire({
+                                                                    icon: 'success',
+                                                                    title: 'Thank you!',
+                                                                    text: 'Your feedback has been submitted successfully'
+                                                                });
+                                                            },
+                                                            error: function (xhr) {
+                                                                Swal.fire({
+                                                                    icon: 'error',
+                                                                    title: 'Error',
+                                                                    text: 'There was a problem submitting your feedback. Please try again later.'
+                                                                });
+                                                                form.append('<div class="alert alert-danger mt-3">Error submitting feedback: ' + xhr.responseText + '</div>');
+                                                            }
+                                                        });
+                                                    });
+                                                }
 
         </script>
     </body>

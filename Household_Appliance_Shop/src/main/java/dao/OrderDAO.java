@@ -255,7 +255,8 @@ public class OrderDAO {
                     order.setPaymentMethodID(rs.getInt("paymentMethodID"));
                     order.setTotalPrice(rs.getDouble("totalPrice"));
                     order.setDeliveryAddress(rs.getString("deliveryAddress"));
-
+                    order.setFullName(rs.getString("fullName"));
+                    order.setPhone(rs.getString("phone"));
                     list.add(order);
                 }
             }

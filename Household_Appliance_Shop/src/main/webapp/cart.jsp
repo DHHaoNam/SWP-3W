@@ -100,12 +100,11 @@
         </style>
     </head>
 
-    <% String error = (String) session.getAttribute("error");
-        if (error != null) {
-    %>
-    <div class="alert alert-danger text-center"><%= error%></div>
-    <% session.removeAttribute("error");
-        } %>
+    <c:if test="${not empty sessionScope.error}">
+        <div class="alert alert-danger text-center">${sessionScope.error}</div>
+        <c:remove var="error" scope="session"/>
+    </c:if>
+
     <body>
         <%-- Header --%>
         <jsp:include page="header.jsp"></jsp:include>

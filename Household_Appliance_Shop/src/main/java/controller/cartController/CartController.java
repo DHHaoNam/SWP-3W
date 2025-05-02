@@ -127,21 +127,24 @@ public class CartController extends HttpServlet {
             System.out.println("Updated Cart List: " + updatedCartList);
             request.setAttribute("cartlists", updatedCartList);
         } else if (productIds != null && quantities != null) {
-            String errorMessage = null;
-
+            StringBuilder errorMessage = new StringBuilder();
             for (int i = 0; i < productIds.length; i++) {
                 int productId = Integer.parseInt(productIds[i]);
                 int quantity = Integer.parseInt(quantities[i]);
-
+                Product p = productDAO.getProductById(productId);
                 // Kiểm tra số lượng tồn kho
                 int stockQuantity = productDAO.getProductStock(productId); // Hàm này lấy số lượng tồn kho
+
                 if (quantity > stockQuantity) {
-                    errorMessage = "Only quantity items left in stock!" + stockQuantity;
-                    break;
+                    errorMessage.append("Chỉ còn ")
+                            .append(stockQuantity)
+                            .append(" sản phẩm trong kho cho: \"")
+                            .append(p.getProductName())
+                            .append("\".<br>");
                 }
             }
 
-            if (errorMessage != null) {
+            if (errorMessage.length() > 0) {
                 session.setAttribute("error", errorMessage);
 
             } else {

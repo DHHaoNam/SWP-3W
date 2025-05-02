@@ -55,6 +55,27 @@
             }
         </style>
     </head>
+    <script>
+        window.onload = function () {
+            var isStaff = ${sessionScope.managerRole == 2};
+
+            if (isStaff) {
+                document.querySelectorAll("input").forEach(function (input) {
+                    if (input.name !== "quantity") {
+                        input.readOnly = true;
+                    }
+                });
+
+                document.querySelectorAll("select").forEach(function (select) {
+                    select.disabled = true;
+                });
+                document.querySelectorAll("input").forEach(function (input) {
+                    select.disabled = true;
+                });
+            }
+        };
+    </script>
+
     <body>
         <jsp:include page="admin_dashboard_header.jsp" />
         <div class="sidebar">
@@ -71,9 +92,9 @@
             <a href="CustomerController_temp"><i class="fas fa-users"></i> Customer Management</a>
             <a href="listAdminOrders"><i class="fas fa-shopping-cart"></i> Order Management</a>
             <a href="FeedbackController"><i class="fas fa-comments"></i> Feedback Management</a>
-                <c:if test="${sessionScope.managerRole == 1}">
-                    <a href="VoucherController"><i class="fas fa-ticket-alt"></i> Voucher Management</a>
-                </c:if>   
+            <c:if test="${sessionScope.managerRole == 1}">
+                <a href="VoucherController"><i class="fas fa-ticket-alt"></i> Voucher Management</a>
+            </c:if>   
             <c:if test="${sessionScope.managerRole == 1}">
                 <a href="RevenueController"><i class="fa-solid fa-chart-simple"></i> Revenue Management</a>
             </c:if> 
