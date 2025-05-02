@@ -1,0 +1,117 @@
+.logo img {
+    width: 70px;
+}
+
+.header-banner {
+    background: url('banner-image.jpg') no-repeat center;
+    background-color: #FC9793;
+    background-size: cover;
+    color: white;
+    padding: 60px 0;
+    text-align: center;
+}
+
+/* Thanh tìm kiếm */
+.search-bar {
+    background-color: #DC3545;
+    padding: 20px 0;
+}
+
+.search-input {
+    width: 60%;
+    padding: 10px;
+    border: none;
+    border-radius: 20px 0 0 20px;
+    outline: none;
+    font-size: 16px;
+}
+
+.search-btn {
+    background-color: white;
+    color: #DC3545;
+    border: none;
+    border-radius: 0 20px 20px 0;
+    padding: 10px 20px;
+    font-size: 16px;
+}
+
+.search-btn i { 
+    color: #DC3545;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .search-input {
+        width: 80%;
+    }
+}
+
+
+/* CSS cho menu điều hướng */
+.menu-nav {
+    margin-top: 5px;
+    display: flex;
+    justify-content: center;
+    background-color: white;
+    padding: 10px 0;
+    border-bottom: 2px solid #DC3545;
+}
+
+.menu-nav a {
+    text-decoration: none;
+    color: black;
+    font-weight: bold;
+    padding: 10px 20px;
+    margin: 0 10px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+}
+
+/* Chỉ thay đổi màu nền và chữ khi di chuột */
+.menu-nav a:hover {
+    background-color: #DC3545;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+}
+
+/* Luôn giữ trạng thái active cho mục được chỉ định */
+.menu-nav a.active {
+    background-color: #DC3545;
+    color: white;
+    border-radius: 5px;
+    padding: 10px 20px;
+}
+
+.menu-btn {
+    text-align: center;
+}
+
+.product-card img {
+    height: 200px;
+    object-fit: cover;
+}
+
+
+/* CSS cho phần giỏ hàng */
+.cart-section {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.cart-section .cart-title {
+    font-weight: bold;
+    font-size: 1.5rem;
+    margin-bottom: 15px;
+}
+
+.cart-section .cart-items {
+    margin-bottom: 10px;
+}
+
+.cart-section .total-price {
+    font-weight: bold;
+    font-size: 1.2rem;
+    margin-top: 15px;
+}
