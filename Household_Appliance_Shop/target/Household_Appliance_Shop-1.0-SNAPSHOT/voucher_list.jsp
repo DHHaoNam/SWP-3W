@@ -209,7 +209,6 @@
                                         <div class="voucher-card">
                                             <h5 class="voucher-title">${v.title}</h5>
                                             <p class="voucher-discount">${v.discount}% trên tổng đơn hàng.</p>
-                                            <p class="voucher-category">Category: ${v.categoryName}</p>
                                             <a href="home?categoryid=${v.categoryID}" class="btn btn-sm btn-outline-primary mt-3">See Products</a>
                                         </div>
                                     </c:forEach>

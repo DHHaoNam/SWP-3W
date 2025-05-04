@@ -5,6 +5,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 import model.Category;
@@ -27,7 +28,9 @@ public class VoucherDAO {
                 + "    v.discount,\n"
                 + "    v.status,\n"
                 + "    v.categoryID,\n"
-                + "    c.categoryName\n"
+                + "    c.categoryName,\n" // ← dấu phẩy ở đây!
+                + "    v.startTime,\n"
+                + "    v.endTime\n"
                 + "FROM \n"
                 + "    Voucher v\n"
                 + "JOIN \n"
@@ -54,6 +57,8 @@ public class VoucherDAO {
                     v.setStatus(rs.getString("status"));
                     v.setCategoryID(rs.getInt("categoryID"));
                     v.setCategoryName(rs.getString("categoryName"));
+                    v.setStartTime(rs.getTimestamp("startTime"));
+                    v.setEndTime(rs.getTimestamp("endTime"));
 
                     list.add(v); // *** Add the created voucher to the list ***
                 }
@@ -68,7 +73,7 @@ public class VoucherDAO {
 
     public List<Voucher> filterVoucher(String voucherID, String status, String categoryID, String sort) {
         List<Voucher> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT v.voucherID, v.title, v.discount, v.status, v.categoryID, c.categoryName "
+        StringBuilder sql = new StringBuilder("SELECT v.voucherID, v.title, v.discount, v.status, v.categoryID, c.categoryName, v.startTime, v.endTime "
                 + "FROM Voucher v JOIN Category c ON v.categoryID = c.categoryID WHERE 1=1");
 
         if (voucherID != null && !voucherID.isEmpty()) {
@@ -121,6 +126,8 @@ public class VoucherDAO {
                 v.setStatus(rs.getString("status"));
                 v.setCategoryID(rs.getInt("categoryID"));
                 v.setCategoryName(rs.getString("categoryName"));
+                v.setStartTime(rs.getTimestamp("startTime"));
+                v.setEndTime(rs.getTimestamp("endTime"));
                 list.add(v);
             }
         } catch (SQLException e) {
@@ -149,7 +156,7 @@ public class VoucherDAO {
 
     public Voucher getVoucherById(int voucherID) {
         Voucher voucher = null;
-        String sql = "SELECT v.voucherID, v.title, v.discount, v.status, v.categoryID, c.categoryName "
+        String sql = "SELECT v.voucherID, v.title, v.discount, v.status, v.categoryID, c.categoryName, v.startTime, v.endTime "
                 + "FROM Voucher v JOIN Category c ON v.categoryID = c.categoryID WHERE v.voucherID = ?";
 
         try (
@@ -164,6 +171,8 @@ public class VoucherDAO {
                 voucher.setStatus(rs.getString("status"));
                 voucher.setCategoryID(rs.getInt("categoryID"));
                 voucher.setCategoryName(rs.getString("categoryName"));
+                voucher.setStartTime(rs.getTimestamp("startTime"));
+                voucher.setEndTime(rs.getTimestamp("endTime"));
             }
         } catch (SQLException e) {
             System.err.println("SQL Error in getVoucherById: " + e.getMessage());
@@ -171,35 +180,79 @@ public class VoucherDAO {
         return voucher;
     }
 
-    public void updateVoucher(int voucherID, String title, double discount, int categoryID, String status) {
-        String sql = "UPDATE Voucher SET title = ?, discount = ?, categoryID = ?, status = ? WHERE voucherID = ?";
-
-        try (
-                 Connection conn = dbcontext.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+    public void updateVoucher(int voucherID, String title, double discount, int categoryID, String status, Timestamp startTime, Timestamp endTime) {
+        String sql = "UPDATE Voucher SET title = ?, discount = ?, categoryID = ?, status = ?, startTime = ?, endTime = ? WHERE voucherID = ?";
+        try ( Connection conn = dbcontext.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, title);
             ps.setDouble(2, discount);
             ps.setInt(3, categoryID);
             ps.setString(4, status);
-            ps.setInt(5, voucherID);
+            ps.setTimestamp(5, startTime);
+            ps.setTimestamp(6, endTime);
+            ps.setInt(7, voucherID);
             ps.executeUpdate();
         } catch (SQLException e) {
             System.err.println("SQL Error in updateVoucher: " + e.getMessage());
         }
     }
 
-    public void addVoucher(String title, double discount, int categoryID, String status) {
-        String sql = "INSERT INTO Voucher (title, discount, categoryID, status) VALUES (?, ?, ?, ?)";
-
-        try (
-                 Connection conn = dbcontext.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+    public void addVoucher(String title, double discount, int categoryID, String status, Timestamp startTime, Timestamp endTime) {
+        String sql = "INSERT INTO Voucher (title, discount, categoryID, status, startTime, endTime) VALUES (?, ?, ?, ?, ?, ?)";
+        try ( Connection conn = dbcontext.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, title);
             ps.setDouble(2, discount);
             ps.setInt(3, categoryID);
             ps.setString(4, status);
+            ps.setTimestamp(5, startTime);
+            ps.setTimestamp(6, endTime);
             ps.executeUpdate();
         } catch (SQLException e) {
             System.err.println("SQL Error in addVoucher: " + e.getMessage());
         }
+    }
+
+    public void deleteVoucher(int voucherID) {
+        try ( Connection connection = dbcontext.getConnection()) {
+            String sql = "DELETE FROM voucher WHERE voucherID = ?";
+            try ( PreparedStatement stmt = connection.prepareStatement(sql)) {
+                stmt.setInt(1, voucherID);
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    System.out.println("Voucher deleted successfully.");
+                } else {
+                    System.out.println("Voucher not found or couldn't be deleted.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public Voucher getVoucherByTitle(String title) {
+        Voucher voucher = null;
+        String sql = "SELECT v.voucherID, v.title, v.discount, v.status, v.categoryID, c.categoryName, v.startTime, v.endTime "
+                + "FROM Voucher v JOIN Category c ON v.categoryID = c.categoryID "
+                + "WHERE v.title = ? AND v.status = 'active' "
+                + "AND GETDATE() BETWEEN v.startTime AND v.endTime AND v.quantity > 0";
+
+        try ( Connection conn = dbcontext.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, title);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                voucher = new Voucher();
+                voucher.setVoucherID(rs.getInt("voucherID"));
+                voucher.setTitle(rs.getString("title"));
+                voucher.setDiscount(rs.getDouble("discount"));
+                voucher.setStatus(rs.getString("status"));
+                voucher.setCategoryID(rs.getInt("categoryID"));
+                voucher.setCategoryName(rs.getString("categoryName"));
+                voucher.setStartTime(rs.getTimestamp("startTime"));
+                voucher.setEndTime(rs.getTimestamp("endTime"));
+            }
+        } catch (SQLException e) {
+            System.err.println("SQL Error in getVoucherByTitle: " + e.getMessage());
+        }
+        return voucher;
     }
 
     public static void main(String[] args) {

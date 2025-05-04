@@ -130,7 +130,7 @@ public class Register extends HttpServlet {
             String code = String.valueOf((int) (Math.random() * 900000) + 100000); // 6 chữ số
 
             try {
-                EmailSender.sendEmail(email, "Mã xác thực tài khoản", "Mã xác thực của bạn là: " + code);
+                EmailSender.sendEmail(email, "Account Verification Code", "Your verification code is: " + code);
 
                 // Lưu thông tin vào session để xử lý sau khi xác thực
                 Customer customer = new Customer();
@@ -144,7 +144,7 @@ public class Register extends HttpServlet {
                 session.setAttribute("verificationCode", code);
                 session.setAttribute("emailToVerify", email);
 
-                request.setAttribute("message", "Mã xác thực đã được gửi tới email của bạn.");
+                request.setAttribute("message", "A verification code has been sent to your email.");
                 request.getRequestDispatcher("verify-email.jsp").forward(request, response);
             } catch (MessagingException ex) {
                 Logger.getLogger(Register.class.getName()).log(Level.SEVERE, null, ex);

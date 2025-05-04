@@ -84,6 +84,12 @@
             <!-- Main content for editing voucher -->
             <div class="content">
                 <h2>Edit Voucher</h2>
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger" role="alert">
+                        ${error}
+                    </div>
+                </c:if>
+
                 <form action="VoucherController" method="post">
                     <input type="hidden" name="action" value="updateVoucher">
                     <input type="hidden" name="voucherID" value="${voucher.voucherID}">
@@ -114,6 +120,21 @@
                             <option value="Inactive" ${voucher.status == 'Inactive' ? 'selected' : ''}>Inactive</option>
                         </select>
                     </div>
+
+                    <div class="mb-3">
+                        <label for="startTime" class="form-label">Start Time</label>
+                        <input type="datetime-local" class="form-control" id="startTime" name="startTime"
+                               value="<fmt:formatDate value='${voucher.startTime}' pattern='yyyy-MM-dd\'T\'HH:mm' />"
+                               required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="endTime" class="form-label">End Time</label>
+                        <input type="datetime-local" class="form-control" id="endTime" name="endTime"
+                               value="<fmt:formatDate value='${voucher.endTime}' pattern='yyyy-MM-dd\'T\'HH:mm' />"
+                               required>
+                    </div>
+
 
                     <button type="submit" class="btn btn-primary">Update Voucher</button>
                     <a href="VoucherController" class="btn btn-secondary">Cancel</a>

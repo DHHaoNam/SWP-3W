@@ -73,17 +73,10 @@ public class CartController extends HttpServlet {
         CartDAO cartDAO = new CartDAO();
         int customerId = customer.getCustomerID();
 
-        // Lấy danh sách giỏ hàng đã chứa thông tin sản phẩm
-        //List<Cart> cartList = cartDAO.getcart(customerId);
-        System.out.println(">> CartController - doGet()");
-        System.out.println("Customer ID: " + customer.getCustomerID());
-
         List<Cart> cartList = cartDAO.getcart(customer.getCustomerID());
-        System.out.println("Cart List Size: " + (cartList != null ? cartList.size() : "NULL"));
 
         if (cartList != null) {
             for (Cart item : cartList) {
-                System.out.println("Product: " + item.getProduct().getProductName() + ", Quantity: " + item.getQuantity());
             }
         }
         request.setAttribute("cartlists", cartList);
@@ -124,7 +117,6 @@ public class CartController extends HttpServlet {
 
             // Cập nhật session sau khi xóa sản phẩm
             List<Cart> updatedCartList = cartDAO.getcart(customerID);
-            System.out.println("Updated Cart List: " + updatedCartList);
             request.setAttribute("cartlists", updatedCartList);
         } else if (productIds != null && quantities != null) {
             StringBuilder errorMessage = new StringBuilder();
@@ -136,9 +128,9 @@ public class CartController extends HttpServlet {
                 int stockQuantity = productDAO.getProductStock(productId); // Hàm này lấy số lượng tồn kho
 
                 if (quantity > stockQuantity) {
-                    errorMessage.append("Chỉ còn ")
+                    errorMessage.append("Only ")
                             .append(stockQuantity)
-                            .append(" sản phẩm trong kho cho: \"")
+                            .append(" left in stock for: \"")
                             .append(p.getProductName())
                             .append("\".<br>");
                 }

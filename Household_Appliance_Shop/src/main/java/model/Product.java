@@ -10,6 +10,7 @@ public class Product {
     private int stock_Quantity;
     private int brandID;
     private String image;
+    private int categoryID;
 
     public Product() {
     }
@@ -20,10 +21,6 @@ public class Product {
         this.image = image;
     }
 
-   
-
-    
-    
     public Product(int productID, String productName, String description, int subCategoryID, double price, int stock_Quantity, int brandID, String image) {
         this.productID = productID;
         this.productName = productName;
@@ -108,5 +105,15 @@ public class Product {
     public void setImage(String image) {
         this.image = image;
     }
+
+    public int getCategoryID() {
+        return categoryID;
+    }
+
+    public void setCategoryID(int categoryID) {
+        this.categoryID = categoryID;
+    }
+    
+    
 
 }

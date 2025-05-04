@@ -152,6 +152,7 @@
                         <li><a href="CustomerManagement">Account Information</a></li>
                         <li><a href="listAddress">Address List</a></li>
                         <li><a href="listOrders">Order History</a></li>
+                        <li><a href="voucher" class="active">Voucher</a></li> <!-- Added active class for example -->
                         <li><a href="changepassword">Change Password</a></li>
                         <li><a href="logout">Logout</a></li>
                     </ul>
@@ -161,7 +162,7 @@
                 <c:if test="${sessionScope.customer != null}">
                     <div class="col-md-9">
                         <div class="account-info">
-                           <h3>Update Account Information</h3>
+                            <h3>Update Account Information</h3>
                             <form action="update-profile" method="post">
 
                                 <div class="info-item">

@@ -181,10 +181,11 @@
                 <div class="row">
                     <!-- Sidebar -->
                     <div class="col-md-3">
-                        <ul>
+                         <ul>
                             <li><a href="CustomerManagement">Account Information</a></li>
                             <li><a href="listAddress">Address List</a></li>
                             <li><a href="listOrders">Order History</a></li>
+                            <li><a href="voucher" class="active">Voucher</a></li> <!-- Added active class for example -->
                             <li><a href="changepassword">Change Password</a></li>
                             <li><a href="logout">Logout</a></li>
                         </ul>

@@ -10,6 +10,7 @@ import dao.CustomerDAO;
 import dao.OrderDAO;
 import dao.PaymentDAO;
 import dao.ProductDAO;
+import dao.VoucherDAO;
 import jakarta.servlet.RequestDispatcher;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -28,6 +29,7 @@ import model.OrderDetail;
 import model.OrderInfo;
 import model.PaymentMethod;
 import model.Product;
+import model.Voucher;
 
 /**
  *
@@ -131,9 +133,15 @@ public class Checkout extends HttpServlet {
             return;
         }
 
+        String action = request.getParameter("action"); // xác định action là apply voucher hay checkout
+        String voucherCode = request.getParameter("voucherCode");
+        request.setAttribute("voucherCode", voucherCode); // giữ lại khi reload
+
         CartDAO cartDAO = new CartDAO();
         OrderDAO orderDAO = new OrderDAO();
         ProductDAO productDAO = new ProductDAO();
+        PaymentDAO paymentDAO = new PaymentDAO();
+        AddressDAO addressDAO = new AddressDAO();
 
         List<Cart> cartItems = cartDAO.getcart(customer.getCustomerID());
 
@@ -142,7 +150,35 @@ public class Checkout extends HttpServlet {
             request.getRequestDispatcher("cart.jsp").forward(request, response);
             return;
         }
+        double total = calculateTotal(cartItems);
+        double discount = 0.0;
+        if ("applyVoucher".equals(action)) {
 
+            if (voucherCode != null && !voucherCode.trim().isEmpty()) {
+                VoucherDAO voucherDAO = new VoucherDAO();
+                Voucher voucher = voucherDAO.getVoucherByTitle(voucherCode.trim());
+                if (voucher != null) {
+                    discount = voucher.getDiscount() / 100;
+
+                    double discountedTotal = total - (total * discount);
+                    request.setAttribute("discountedTotal", discountedTotal);
+                    request.setAttribute("successMessage", "Discount code applied successfully!");
+                } else {
+                    request.setAttribute("errorMessage", "Voucher is invalid or expired!");
+                }
+            }
+
+            // Trả về lại trang checkout với dữ liệu cần thiết
+            request.setAttribute("cartItems", cartItems);
+            request.setAttribute("paymentMethods", paymentDAO.getAllPaymentMethods());
+            request.setAttribute("defaultAddress", addressDAO.getDefaultAddress(customer.getCustomerID()));
+            request.setAttribute("customer", customer);
+            request.setAttribute("total", total); // Tổng gốc
+            request.getRequestDispatcher("checkout.jsp").forward(request, response);
+            return;
+        }
+
+        // Bắt đầu xử lý đặt hàng
         try {
             int paymentMethodID = parseIntSafe(request.getParameter("paymentMethodID"));
             String deliveryAddress = request.getParameter("deliveryAddress");
@@ -153,20 +189,23 @@ public class Checkout extends HttpServlet {
                 return;
             }
 
-            // Tính tổng tiền
-            double total = calculateTotal(cartItems);
+            double finalTotal = (request.getAttribute("discountedTotal") != null)
+                    ? (double) request.getAttribute("discountedTotal")
+                    : total;
 
-            // Tạo OrderInfo mới
+            // Debugging the final total before placing the order
+            // Tạo order
             OrderInfo order = new OrderInfo();
             order.setCustomerID(customer.getCustomerID());
             order.setOrderStatus(1);
             order.setOrderDate(new java.sql.Date(System.currentTimeMillis()));
             order.setManagerID(1);
             order.setPaymentMethodID(paymentMethodID);
-            order.setTotalPrice(total);
+            order.setTotalPrice(finalTotal);
             order.setDeliveryAddress(deliveryAddress);
             order.setFullName(customer.getFullName());
             order.setPhone(customer.getPhone());
+
             int orderID = orderDAO.createOrder(order);
 
             if (orderID == -1) {
@@ -175,7 +214,7 @@ public class Checkout extends HttpServlet {
                 return;
             }
 
-            boolean added = orderDAO.addOrderItem(orderID, customer.getCustomerID());
+            boolean added = orderDAO.addOrderItem(orderID, customer.getCustomerID(), discount);
 
             if (!added) {
                 request.setAttribute("errorMessage", "Cannot add the product to the order!");
@@ -183,9 +222,9 @@ public class Checkout extends HttpServlet {
                 return;
             }
 
+            // Cập nhật tồn kho
             for (Cart item : cartItems) {
                 boolean updated = productDAO.updateStock(item.getProduct().getProductID(), item.getQuantity());
-
                 if (!updated) {
                     request.setAttribute("errorMessage", "Failed to update stock for product ID: " + item.getProduct().getProductID());
                     request.getRequestDispatcher("checkout.jsp").forward(request, response);
@@ -194,7 +233,7 @@ public class Checkout extends HttpServlet {
             }
 
             cartDAO.clearCart(customer.getCustomerID());
-            session.setAttribute("successMessage", "Đặt hàng thành công!");
+            session.setAttribute("successMessage", "Order successful!   ");
             response.sendRedirect("listOrders");
 
         } catch (Exception e) {

@@ -53,11 +53,53 @@
                 background-color: #5a6268;
             }
 
+            /* Định dạng các phần hiển thị giá trị */
+            .total-amount, .total-after-discount {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                font-size: 1.2rem;
+            }
+
+            .total-amount b, .total-after-discount b {
+                font-weight: bold;
+            }
+
+            .total-amount span, .total-after-discount span {
+                font-size: 1.4rem;
+                color: #333;
+            }
+
+            .total-amount .price {
+                font-size: 1.4rem;
+                color: #007bff; /* Màu xanh cho giá trị ban đầu */
+            }
+
+            .total-after-discount .price {
+                font-size: 1.6rem;
+                color: #ff5733; /* Màu đỏ cho giá trị sau giảm giá */
+                font-weight: bold;
+            }
+
+            /* Đảm bảo thông tin "Voucher" có vẻ ngoài rõ ràng */
+            .voucher-section {
+                margin-top: 20px;
+                display: flex;
+                flex-direction: column;
+                align-items: flex-end;
+            }
+
+            .voucher-section .voucher-input {
+                margin-right: 10px;
+                width: 80%;
+            }
+
 
         </style>
 
     </head>
     <body>
+
 
         <jsp:include page="header.jsp"></jsp:include>
 
@@ -66,6 +108,12 @@
 
             <% if (cartItems == null || cartItems.isEmpty()) { %>
             <div class="empty-cart-container text-center">
+                <% String errorMessage = (String) request.getAttribute("errorMessage"); %>
+                <% if (errorMessage != null) {%>
+                <div style="color: red; font-weight: bold; margin-top: 10px;">
+                    <%= errorMessage%>
+                </div>
+                <% } %>
                 <p class="empty-cart-message">Your cart is empty.</p>
                 <a class="btn btn-secondary" href="home">Continue Shopping</a>
             </div>
@@ -92,7 +140,7 @@
                     </tbody>
                 </table>
 
-                <p class="text-end"><b>Total Amount: <fmt:formatNumber value="<%= total%>" pattern="#,###đ"/></b></p>
+
 
                 <!-- Thông tin khách hàng -->
                 <div class="mb-3">
@@ -118,11 +166,6 @@
                            value="<%= (defaultAddress != null) ? defaultAddress.getAddressDetail() : ""%>" required>
                 </div>
 
-                <!-- Phương thức giao hàng -->
-
-                <!-- Phương thức thanh toán -->
-
-                <!-- Trường ẩn để gửi paymentMethodID -->
                 <input type="hidden" name="paymentMethodID" value="<%= paymentMethods.get(0).getPaymentMethodID()%>">
 
                 <!-- Phương thức thanh toán -->
@@ -130,6 +173,43 @@
                     <label class="form-label">Payment Method:</label>
                     <input type="text" class="form-control" value="<%= paymentMethods.get(0).getMethodName()%>" readonly />
                 </div>
+
+                <!-- Ô nhập voucher -->
+                <%
+                    Double discountedTotal = (Double) request.getAttribute("discountedTotal");
+                %>
+                <p class="text-end total-amount">
+                    <b>Total Amount: </b>
+                    <span class="price"><fmt:formatNumber value="<%= total%>" pattern="#,###đ"/></span>
+                </p>
+
+                <% if (discountedTotal != null) {%>
+                <p class="text-end total-after-discount">
+                    <b>Total After Discount: </b>
+                    <span class="price"><fmt:formatNumber value="<%= discountedTotal%>" pattern="#,###đ"/></span>
+                </p>
+                <% }%>
+                <!-- Phần nhập voucher -->
+                <div class="voucher-section">
+                    <label class="form-label">Voucher title: </label>
+                    <div class="d-flex">
+                        <input type="text" class="form-control voucher-input" name="voucherCode" value="<%= request.getAttribute("voucherCode") != null ? request.getAttribute("voucherCode") : ""%>" placeholder="Enter your voucher title">
+                        <button type="submit" name="action" value="applyVoucher" class="btn btn-primary ms-2">Apply</button>
+                    </div>
+                    <!-- Hiển thị thông báo sau khi nhập mã -->
+                    <%
+                        String successMessage = (String) request.getAttribute("successMessage");
+                        String errorMessage = (String) request.getAttribute("errorMessage");
+                        if (successMessage != null) {
+                    %>
+                    <div class="alert alert-success mt-2"><%= successMessage%></div>
+                    <%
+                    } else if (errorMessage != null) {
+                    %>
+                    <div class="alert alert-danger mt-2"><%= errorMessage%></div>
+                    <%
+                        }
+                    %>                </div>
 
                 <div class="text-center" style="margin-bottom: 30px">
                     <button type="submit" class="btn btn-success" style="border-radius: 20px">Checkout</button>

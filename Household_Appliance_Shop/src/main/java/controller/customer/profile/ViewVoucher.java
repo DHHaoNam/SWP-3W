@@ -4,7 +4,6 @@
  */
 package controller.customer.profile;
 
-
 import dao.VoucherDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -35,7 +34,7 @@ public class ViewVoucher extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try (PrintWriter out = response.getWriter()) {
+        try ( PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             out.println("<!DOCTYPE html>");
             out.println("<html>");
@@ -74,7 +73,7 @@ public class ViewVoucher extends HttpServlet {
             VoucherDAO dao = new VoucherDAO();
             List<Voucher> vList = dao.ViewVoucher();
             request.setAttribute("voucherList", vList);
-            request.getRequestDispatcher("voucher_list.jsp").forward(request, response); 
+            request.getRequestDispatcher("voucher_list.jsp").forward(request, response);
         } catch (Exception e) {
             e.printStackTrace();
         }

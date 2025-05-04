@@ -146,9 +146,9 @@
             <a href="CustomerController_temp"><i class="fas fa-users"></i> Account Management</a>
             <a href="listAdminOrders"><i class="fas fa-shopping-cart"></i> Order Management</a>
             <a href="FeedbackController"><i class="fas fa-comments"></i> Feedback Management</a>
-                <c:if test="${sessionScope.managerRole == 1}">
-                    <a href="VoucherController"><i class="fas fa-ticket-alt"></i> Voucher Management</a>
-                </c:if>   
+            <c:if test="${sessionScope.managerRole == 1}">
+                <a href="VoucherController"><i class="fas fa-ticket-alt"></i> Voucher Management</a>
+            </c:if>   
             <c:if test="${sessionScope.managerRole == 1}">
                 <a href="RevenueController"><i class="fa-solid fa-chart-simple"></i> Revenue Management</a>
             </c:if> 

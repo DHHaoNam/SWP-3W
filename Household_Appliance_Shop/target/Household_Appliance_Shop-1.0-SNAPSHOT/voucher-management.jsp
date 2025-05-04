@@ -155,6 +155,8 @@
                                     <th>Discount (%)</th>
                                     <th>Status</th>
                                     <th>Category</th>
+                                    <th>Start Time</th> <!-- Thêm cột Start Time -->
+                                    <th>End Time</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -166,10 +168,19 @@
                                         <td>${v.discount}</td>
                                         <td>${v.status}</td>
                                         <td>${v.categoryName}</td>
-                                        <td>
-                                            <a href="VoucherController?action=edit&id=${v.voucherID}" class="btn btn-primary">
+                                        <td>${v.startTime}</td> <!-- Hiển thị giá trị Start Time -->
+                                        <td>${v.endTime}</td>
+                                        <td class="d-flex gap-2">
+                                            <a href="VoucherController?action=edit&id=${v.voucherID}" class="btn btn-primary btn-sm">
                                                 <i class="fas fa-pen"></i> Edit
                                             </a>
+                                            <form action="VoucherController" method="post" onsubmit="return confirm('Are you sure you want to delete this voucher?');">
+                                                <input type="hidden" name="action" value="delete"/>
+                                                <input type="hidden" name="voucherID" value="${v.voucherID}"/>
+                                                <button type="submit" class="btn btn-danger btn-sm">
+                                                    <i class="fas fa-trash"></i> Delete
+                                                </button>
+                                            </form>
                                         </td>
                                     </tr>
                                 </c:forEach>

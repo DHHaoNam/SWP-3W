@@ -49,7 +49,8 @@
                                 <li><a href="CustomerManagement"><i class="fas fa-user-circle me-2"></i>My Account</a></li>
                                 <li><a href="listAddress"><i class="fas fa-map-marker-alt me-2"></i>Address List</a></li>
                                 <li><a href="listOrders"><i class="fas fa-history me-2"></i>Order History</a></li>
-                                <li><a href="changepassword">Change Password</a></li>
+                                <li><a href="voucher" class="active"><i class="fas fa-tag me-2"></i>Voucher</a></li> <!-- Added active class for example -->
+                                <li><a href="changepassword" ><i class="fas fa-key me-2"></i>Change Password</a></li>
                                 <li><a href="logout"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
                             </ul>
                         </c:if>

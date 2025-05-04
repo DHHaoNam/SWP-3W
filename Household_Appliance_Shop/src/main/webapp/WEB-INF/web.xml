@@ -96,10 +96,10 @@
         <servlet-name>SubCategoryController</servlet-name>
         <servlet-class>controller.product.SubCategoryController</servlet-class>
     </servlet>
-    <servlet>
+    <!--    <servlet>
         <servlet-name>VoucherController</servlet-name>
         <servlet-class>controller.product.VoucherController</servlet-class>
-    </servlet>
+    </servlet>-->
     <servlet>
         <servlet-name>ViewVoucher</servlet-name>
         <servlet-class>controller.customer.profile.ViewVoucher</servlet-class>
@@ -127,6 +127,10 @@
     <servlet>
         <servlet-name>FeedbackController</servlet-name>
         <servlet-class>controller.product.FeedbackController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>VoucherController</servlet-name>
+        <servlet-class>controller.voucher.VoucherController</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ProductController</servlet-name>
@@ -334,10 +338,7 @@
         <url-pattern>/delete-subcategory</url-pattern>
         <url-pattern>/edit-subcategory</url-pattern>
     </servlet-mapping>
-    <servlet-mapping>
-        <servlet-name>VoucherController</servlet-name>
-        <url-pattern>/VoucherController</url-pattern>
-    </servlet-mapping>
+
     <servlet-mapping>
         <servlet-name>ViewVoucher</servlet-name>
         <url-pattern>/voucher</url-pattern>
@@ -367,8 +368,10 @@
         <url-pattern>/FeedbackController</url-pattern>
         <url-pattern>/viewFeedback</url-pattern>
         <url-pattern>/admin-delete-feedback</url-pattern>
-
-       
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>VoucherController</servlet-name>
+        <url-pattern>/VoucherController</url-pattern>
     </servlet-mapping>
     <session-config>
         <session-timeout>

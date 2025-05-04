@@ -550,7 +550,49 @@ public class OrderDAO {
 //        }
 //        return false;
 //    }
-    public boolean addOrderItem(int orderID, int customerID) {
+//    public boolean addOrderItem(int orderID, int customerID) {
+//        String insertSQL = "INSERT INTO OrderDetail (orderID, productID, quantity, totalPrice) "
+//                + "VALUES (?, ?, ?, ?)";
+//
+//        String updateTotalPriceSQL = "UPDATE OrderInfo "
+//                + "SET totalPrice = (SELECT SUM(totalPrice) FROM OrderDetail WHERE orderID = ?) "
+//                + "WHERE orderID = ?";
+//
+//        try ( Connection conn = dbcontext.getConnection()) {
+//            conn.setAutoCommit(false);
+//            CartDAO cartDAO = new CartDAO();
+//
+//            // Lấy các item trong giỏ hàng
+//            List<Cart> cartItems = cartDAO.getcart(customerID);
+//
+//            try ( PreparedStatement insertStmt = conn.prepareStatement(insertSQL)) {
+//                for (Cart item : cartItems) {
+//                    insertStmt.setInt(1, orderID);
+//                    insertStmt.setInt(2, item.getProduct().getProductID());
+//                    insertStmt.setInt(3, item.getQuantity());
+//                    insertStmt.setDouble(4, item.getTotalPrice()); // Tổng tiền cho mỗi sản phẩm
+//                    insertStmt.addBatch(); // dùng batch để tối ưu
+//                }
+//                insertStmt.executeBatch(); // Thực thi một lần
+//            }
+//
+//            // Cập nhật tổng tiền đơn hàng
+//            try ( PreparedStatement updateStmt = conn.prepareStatement(updateTotalPriceSQL)) {
+//                updateStmt.setInt(1, orderID);
+//                updateStmt.setInt(2, orderID);
+//                updateStmt.executeUpdate();
+//            }
+//
+//            conn.commit();
+//            return true;
+//
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//
+//        return false;
+//    }
+    public boolean addOrderItem(int orderID, int customerID, double discount) {
         String insertSQL = "INSERT INTO OrderDetail (orderID, productID, quantity, totalPrice) "
                 + "VALUES (?, ?, ?, ?)";
 
@@ -567,16 +609,17 @@ public class OrderDAO {
 
             try ( PreparedStatement insertStmt = conn.prepareStatement(insertSQL)) {
                 for (Cart item : cartItems) {
+                    double discountedPrice = item.getProduct().getPrice() * (1 - discount); // Tính giá đã giảm
                     insertStmt.setInt(1, orderID);
                     insertStmt.setInt(2, item.getProduct().getProductID());
                     insertStmt.setInt(3, item.getQuantity());
-                    insertStmt.setDouble(4, item.getTotalPrice()); // Tổng tiền cho mỗi sản phẩm
+                    insertStmt.setDouble(4, discountedPrice * item.getQuantity()); // Lưu giá đã giảm cho sản phẩm
                     insertStmt.addBatch(); // dùng batch để tối ưu
                 }
                 insertStmt.executeBatch(); // Thực thi một lần
             }
 
-            // Cập nhật tổng tiền đơn hàng
+            // Cập nhật tổng tiền đơn hàng sau khi tính giảm giá
             try ( PreparedStatement updateStmt = conn.prepareStatement(updateTotalPriceSQL)) {
                 updateStmt.setInt(1, orderID);
                 updateStmt.setInt(2, orderID);

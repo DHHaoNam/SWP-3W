@@ -87,7 +87,8 @@ public class SendVerificationEmail extends HttpServlet {
         try {
             EmailSender.sendEmail(to, "Account Verification Code", "Your verification code is: " + code);
 
-            request.getSession().setAttribute("verificationCode", code); // Change this line            request.getSession().setAttribute("emailToVerify", to);
+            request.getSession().setAttribute("verificationCode", code); // Change this line           
+            request.getSession().setAttribute("emailToVerify", to);
             request.setAttribute("message", "The verification code has been sent to your email.");
         } catch (jakarta.mail.MessagingException ex) {
             Logger.getLogger(SendVerificationEmail.class.getName()).log(Level.SEVERE, null, ex);

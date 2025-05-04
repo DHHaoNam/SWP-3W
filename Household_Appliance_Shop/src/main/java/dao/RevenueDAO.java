@@ -25,12 +25,15 @@ public class RevenueDAO {
 
     public List<RevenueDTO> getRevenueByDateRange(java.util.Date startDate, java.util.Date endDate) {
         List<RevenueDTO> revenueList = new ArrayList<>();
-        String sql = "SELECT "
-                + "    orderDate AS order_date, "
-                + "    SUM(totalPrice) AS daily_revenue "
-                + "FROM OrderInfo "
-                + "WHERE orderDate BETWEEN ? AND ? "
-                + "GROUP BY orderDate "
+
+        String sql = "SELECT \n"
+                + "    oi.orderDate AS order_date, \n"
+                + "    SUM(oi.totalPrice) AS daily_revenue \n"
+                + "FROM OrderInfo oi\n"
+                + "JOIN OrderStatus os ON oi.orderStatus = os.orderStatusID\n"
+                + "WHERE oi.orderDate BETWEEN ? AND ? \n"
+                + "  AND os.statusName = 'Delivered'\n"
+                + "GROUP BY oi.orderDate \n"
                 + "ORDER BY order_date";
 
         try ( PreparedStatement stmt = dbcontext.getConnection().prepareStatement(sql)) {

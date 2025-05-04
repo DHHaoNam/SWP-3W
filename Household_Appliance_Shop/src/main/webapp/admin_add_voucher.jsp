@@ -84,6 +84,14 @@
             <!-- Main content for adding voucher -->
             <div class="content">
                 <h2>Add New Voucher</h2>
+
+                <!-- ✅ Hiển thị lỗi nếu có -->
+                <c:if test="${not empty error}">
+                    <div class="alert alert-danger" role="alert">
+                        ${error}
+                    </div>
+                </c:if>
+
                 <form action="VoucherController" method="post">
                     <input type="hidden" name="action" value="addVoucher">
 
@@ -94,7 +102,7 @@
 
                     <div class="mb-3">
                         <label for="discount" class="form-label">Discount (%)</label>
-                        <input type="number" class="form-control" id="discount" name="discount" min="0" max="100" step="0.01" required>
+                        <input type="number" class="form-control" id="discount" name="discount" min="0" max="50" step="0.01" required>
                     </div>
 
                     <div class="mb-3">
@@ -112,6 +120,17 @@
                             <option value="Active">Active</option>
                             <option value="Inactive">Inactive</option>
                         </select>
+                    </div>
+
+                    <!-- ✅ Thêm phần nhập startTime và endTime -->
+                    <div class="mb-3">
+                        <label for="startTime" class="form-label">Start Time</label>
+                        <input type="datetime-local" class="form-control" id="startTime" name="startTime" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label for="endTime" class="form-label">End Time</label>
+                        <input type="datetime-local" class="form-control" id="endTime" name="endTime" required>
                     </div>
 
                     <button type="submit" class="btn btn-success"><i class="fas fa-plus"></i> Add Voucher</button>
